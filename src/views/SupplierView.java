@@ -1,5 +1,6 @@
 package views;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
@@ -42,6 +43,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import java.awt.event.KeyAdapter;
+import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import javax.swing.JTextArea;
 import javax.swing.DropMode;
@@ -54,8 +56,10 @@ import java.beans.PropertyChangeEvent;
 
 public class SupplierView  extends JInternalFrame  {
 	
+	static SupplierView pl;
 	boolean flagContact = false;
 	boolean flagSupplier = false;
+	static boolean plClosing = false;
 	int index = 0;
 	private String selectedItem;
 	private ArrayList<Supplier> suppliers = null;
@@ -65,12 +69,14 @@ public class SupplierView  extends JInternalFrame  {
 	private JTextField searchSupplier;
 	private JTable modelSup;
 	private JTable modelContact;
+	private SupplierCrudController supplierCrudController = new SupplierCrudController();
+
 	//private JFrame frame;
 
 	/**
 	 * Create the application.
 	 */
-	public SupplierView(String idSupplier) throws SQLException, PropertyVetoException {
+	public SupplierView(final String idSupplier) throws SQLException, PropertyVetoException {
 		getContentPane().setForeground(Color.GRAY);
 		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 15));
 		getContentPane().setBackground(UIManager.getColor("Button.background"));
@@ -88,14 +94,22 @@ public class SupplierView  extends JInternalFrame  {
 		getContentPane().add(lblNewLabel);
 		lblNewLabel.setBounds(10, 10, 369, 42);
 		
-		suppliers = SupplierCrudController.showAllProvider();
+		final JTextArea textAreaCommentCont = new JTextArea();
+		textAreaCommentCont.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, TitledBorder.TOP, null, SystemColor.controlDkShadow));
+		textAreaCommentCont.setRows(10);
+		textAreaCommentCont.setLineWrap(true);
+		textAreaCommentCont.setDropMode(DropMode.INSERT);
+		textAreaCommentCont.setBounds(1034, 345, 302, 106);
+		getContentPane().add(textAreaCommentCont);
+		
+		suppliers = supplierCrudController.showAllProvider();
 		Object[] supplierData = null;
-		final Object[][] dataSuppliers = new Object[suppliers.size()][5];
+		final Object[][] dataSuppliers = new Object[suppliers.size()][4];
 		String[] header = {"Id", "Adresse", "Fournisseur", "Téléphone"};
 	
 		for (int i = 0; i < suppliers.size(); i++)
 		{	
-			supplierData = new Object[5];
+			supplierData = new Object[6];
 			supplierData[0] = suppliers.get(i).getSupId();
 			supplierData[1] = suppliers.get(i).getSupplierAddress();
 			supplierData[2] = suppliers.get(i).getSupplierName();
@@ -104,61 +118,10 @@ public class SupplierView  extends JInternalFrame  {
 			
 			dataSuppliers[i] = supplierData;
 		}
-		
-		modelSup = new JTable(dataSuppliers, header);
-		
-		modelSup.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				index = modelSup.getSelectedRow();
-				flagSupplier=true;
-				modelSup.addKeyListener(new KeyAdapter() {
-					@Override
-					public void keyReleased(KeyEvent e) {
-						int id = (Integer)dataSuppliers[index][0];
-						
-						SupplierCrudController modify = new SupplierCrudController();
-
-						String address=(String) modelSup.getValueAt(index, 1).toString();
-						String supplierName=(String) modelSup.getValueAt(index, 2).toString();
-						String phone=(String) modelSup.getValueAt(index, 3).toString();
-						int contId = (Integer)dataSuppliers[index][4];
-						
-						System.out.println("je test id :"+id);
-						System.out.println("je test adress :"+address);
-						System.out.println("je test nom:"+supplierName);
-						System.out.println("je test tel :"+phone);
-						System.out.println("je test cont :"+contId);
-						
-						Supplier supplier = new Supplier (id, address, supplierName, phone, contId);
-						modify.upDateSup(supplier);
-					}
-				});
-				
-				if (flagSupplier) {
-					//int selection =(Integer) dataSuppliers[index][4];
-					String selection = dataSuppliers[index][2].toString();
-					System.out.println(selection);
-					filter(selection, modelContact);
-				}
-			}
-		});
-		modelSup.setFillsViewportHeight(true);
-		modelSup.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(153, 153, 153)));
-		
-		final JScrollPane scrollSup = new JScrollPane(modelSup);
-		scrollSup.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(102, 102, 102)));
-		modelSup.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
-		scrollSup.setColumnHeaderView(modelSup.getTableHeader());
-		scrollSup.setBounds(203, 92, 1133, 151);
-		
-		getContentPane().add(scrollSup);
-		
 		contacts = ContactCrudController.showListContact();
 		Object[] contactsData = null;
 		final Object[][] dataContacts = new Object[contacts.size()][7];
-		String[] headerContacts = {"Id", "Nom", "Prénom", "Téléphone", "Portable", "Mail", "Fonction"};
+		String[] headerContacts = {"Id","Nom", "Prénom", "Téléphone", "Portable", "Mail", "Fonction"};
 	
 		for (int i = 0; i < contacts.size(); i++)
 		{	
@@ -175,13 +138,51 @@ public class SupplierView  extends JInternalFrame  {
 			dataContacts[i] = contactsData;
 		}
 		
-		final JTextArea textAreaCommentCont = new JTextArea();
-		textAreaCommentCont.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, TitledBorder.TOP, null, SystemColor.controlDkShadow));
-		textAreaCommentCont.setRows(10);
-		textAreaCommentCont.setLineWrap(true);
-		textAreaCommentCont.setDropMode(DropMode.INSERT);
-		textAreaCommentCont.setBounds(1034, 345, 302, 106);
-		getContentPane().add(textAreaCommentCont);
+		modelSup = new JTable(dataSuppliers, header);
+		
+		modelSup.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				index = modelSup.getSelectedRow();
+				flagSupplier=true;
+				modelSup.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent e) {
+						int id = (Integer)dataSuppliers[index][0];
+						
+						SupplierCrudController modify = new SupplierCrudController();
+						String address=(String) modelSup.getValueAt(index, 1).toString();
+						String supplierName=(String) modelSup.getValueAt(index, 2).toString();
+						String phone=(String) modelSup.getValueAt(index, 3).toString();
+						int contId = (Integer)dataSuppliers[index][4];
+						
+						Supplier supplier = new Supplier (id, address, supplierName, phone, contId);
+						modify.upDateSup(supplier);
+					}
+				});
+				
+				if (flagSupplier) {
+					String selection = dataSuppliers[index][2].toString();
+					System.out.println(selection);
+					filter(selection, modelContact);
+					textAreaCommentCont.setText((dataContacts[index][7]).toString());
+				}
+			}
+		});
+		modelSup.setFillsViewportHeight(true);
+		modelSup.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(153, 153, 153)));
+		
+		final JScrollPane scrollSup = new JScrollPane(modelSup);
+		scrollSup.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(102, 102, 102)));
+		modelSup.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		scrollSup.setColumnHeaderView(modelSup.getTableHeader());
+		scrollSup.setBounds(203, 92, 1133, 151);
+		
+		getContentPane().add(scrollSup);
+		
+		
+		
 		
 		modelContact = new JTable(dataContacts, headerContacts);
 		modelContact.addMouseListener(new MouseAdapter() {
@@ -192,7 +193,7 @@ public class SupplierView  extends JInternalFrame  {
 				textAreaCommentCont.setText((dataContacts[index][7]).toString());
 				flagContact=true;
 				
-				modelSup.addKeyListener(new KeyAdapter() {
+				modelContact.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent e) {
 						int id = (Integer)dataSuppliers[index][0];
@@ -200,31 +201,24 @@ public class SupplierView  extends JInternalFrame  {
 						ContactCrudController modifyCont = new ContactCrudController();
 
 						int contId = (Integer)dataSuppliers[index][4];
-						String name=(String) modelSup.getValueAt(index, 1).toString();
-						String FName=(String) modelSup.getValueAt(index, 2).toString();
-						String CPhone=(String) modelSup.getValueAt(index, 3).toString();
-						String CCell=(String) modelSup.getValueAt(index, 4).toString();
-						String CMail=(String) modelSup.getValueAt(index, 5).toString();
-						String CPosition=(String) modelSup.getValueAt(index, 6).toString();
-						String CComment=(String) modelSup.getValueAt(index, 7).toString();
-						
-						System.out.println("je test id :"+contId);
-						System.out.println("je test nom :"+name);
-						System.out.println("je test prenom:"+FName);
-						System.out.println("je test tel :"+CPhone);
-						System.out.println("je test mobile :"+CCell);
-						System.out.println("je test mail :"+CMail);
-						System.out.println("je test fonction :"+CPosition);
-						System.out.println("je test comment :"+CComment);
+						String name=(String) modelContact.getValueAt(index, 1).toString();
+						String FName=(String) modelContact.getValueAt(index, 2).toString();
+						String CPhone=(String) modelContact.getValueAt(index, 3).toString();
+						String CCell=(String) modelContact.getValueAt(index, 4).toString();
+						String CMail=(String) modelContact.getValueAt(index, 5).toString();
+						String CPosition=(String) modelContact.getValueAt(index, 6).toString();
+						String CComment=(String) modelContact.getValueAt(index, 7).toString();
 						
 						Contact contact = new Contact (contId, name, FName, CPhone, CCell, CMail, CPosition, CComment);
 						modifyCont.upDateContact(contact);
 					}
 				});
 				
-				if(flagContact) {
-					
-				}
+				/*if (flagContact) {
+					String selection = dataContacts[index][1].toString();
+					System.out.println(selection);
+					filter(selection, modelSup);
+				};*/
 			}
 		});
 		modelContact.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -272,7 +266,6 @@ public class SupplierView  extends JInternalFrame  {
 							}
 					} else if(flagContact) {
 						JOptionPane.showMessageDialog(null, "Vous ne pouvez pas supprimer un contact lié a un fournisseur, veuillez s'il vous plait mettre a jour le contact ");
-						//trouver comment deselectionner la row
 						}
 				}else {
 					JOptionPane.showMessageDialog(null, " veuillez s'il vous plait selectionner un fournisseur a supprimer ");
@@ -287,54 +280,63 @@ public class SupplierView  extends JInternalFrame  {
 		btnDelete.setBounds(56, 173, 104, 21);
 		getContentPane().add(btnDelete);
 		
-//		JButton btnModifier = new JButton("Modifier");
-//		btnModifier.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				SupplierCrudController modify = new SupplierCrudController();
-//				
-//				int id = (Integer)dataSuppliers[index][0];
-//				String address=(String) modelSup.getValueAt(index, 1).toString();
-//				String supplierName=(String) modelSup.getValueAt(index, 2).toString();
-//				String phone=(String) modelSup.getValueAt(index, 3).toString();
-//				int contId = (Integer)dataSuppliers[index][4];
-//				
-//				
-//				System.out.println("je test id :"+id);
-//				System.out.println("je test adress :"+address);
-//				System.out.println("je test nom:"+supplierName);
-//				System.out.println("je test tel :"+phone);
-//				System.out.println("je test cont :"+contId);
-//				
-//				Supplier supplier = new Supplier (id, address, supplierName, phone, contId);
-//				modify.upDateSup(supplier);
-//			}
-//		});
-//		btnModifier.setHorizontalTextPosition(SwingConstants.CENTER);
-//		btnModifier.setForeground(Color.WHITE);
-//		btnModifier.setBounds(new Rectangle(50, 50, 50, 50));
-//		btnModifier.setBorderPainted(false);
-//		btnModifier.setBackground(SystemColor.controlShadow);
-//		btnModifier.setBounds(55, 178, 104, 21);
-//		getContentPane().add(btnModifier);
+		JButton btnModifier = new JButton("Effacer la recherche");
+		btnModifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 		
-		searchContact = new JTextField();
+				try {
+					
+					SupplierView.pl = new SupplierView(null);
+					HomeView.desk.add(pl);
+					textAreaCommentCont.setText(" ");
+					pl.show();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (PropertyVetoException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				
+			}
+		});
+		btnModifier.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnModifier.setForeground(Color.WHITE);
+		btnModifier.setBounds(new Rectangle(50, 50, 50, 50));
+		btnModifier.setBorderPainted(false);
+		btnModifier.setBackground(SystemColor.controlShadow);
+		btnModifier.setBounds(894, 58, 159, 21);
+		getContentPane().add(btnModifier);
+		
+		
+		searchContact = new JTextField(idSupplier);
+		searchContact.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				String searchCont = searchContact.getText().toLowerCase();
+				filter(searchCont, modelContact);
+				//modelContact.ListSelectModel(index);
+				//ZStextAreaCommentCont.setText((dataContacts[index][7]).toString());
+			}
+		});
 		searchContact.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				String search = searchContact.getText().toLowerCase();
-				filter(search, modelContact);				
+				String searchCont = searchContact.getText().toLowerCase();
+				filter( searchCont, modelContact);
+				
 			}
 		});
+		searchContact.setColumns(10);
 		searchContact.setBounds(253, 280, 453, 26);
 		getContentPane().add(searchContact);
-		searchContact.setColumns(10);
 		
 		searchSupplier = new JTextField(idSupplier);
 		searchSupplier.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
 				String search = searchSupplier.getText().toLowerCase();
 				filter(search, modelSup);
-				filter(search, modelContact);
+				
 			}
 		});
 		searchSupplier.addKeyListener(new KeyAdapter() {
@@ -342,7 +344,7 @@ public class SupplierView  extends JInternalFrame  {
 			public void keyReleased(KeyEvent e) {
 				String search = searchSupplier.getText().toLowerCase();
 				filter(search, modelSup);
-				filter(search, modelContact);
+				
 				
 			}
 		});
@@ -366,8 +368,42 @@ public class SupplierView  extends JInternalFrame  {
 		labelCommentCont.setBounds(1034, 322, 400, 13);
 		getContentPane().add(labelCommentCont);
 		
-	
 		
+		if(StockView.flagReturn == true) {
+			
+			JButton btnreturn = new JButton("Retour");
+			btnreturn.setHorizontalTextPosition(SwingConstants.CENTER);
+			btnreturn.setForeground(Color.WHITE);
+			btnreturn.setBounds(new Rectangle(50, 50, 50, 50));
+			btnreturn.setBorderPainted(false);
+			btnreturn.setBackground(Color.GRAY);
+			btnreturn.setBounds(1232, 61, 104, 21);
+			getContentPane().add(btnreturn);
+			
+			btnreturn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					System.out.println("ID ENREGISTRE "+StockView.index);
+					StockView.flagReturn = false; 
+					
+						
+						SupplierView.pl.setVisible(false);
+						try {
+							StockView.sv = new StockView();
+							System.out.println();
+							HomeView.desk.add(StockView.sv);
+							StockView.sv.show();
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (PropertyVetoException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+				
+				}
+			});
+		}
 		
 		removeTitleBar();
 	}
@@ -382,7 +418,6 @@ public class SupplierView  extends JInternalFrame  {
 	}
 	
 	public void filter (String search, JTable model) {
-		//TableModel dm = modelSup.getModel();
 		TableRowSorter<TableModel> trs = new TableRowSorter<TableModel>(model.getModel());
 		model.setRowSorter(trs);
 		

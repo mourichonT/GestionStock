@@ -24,7 +24,7 @@ public class LoginView {
 	private JTextField Login_textField;
 	public static boolean flag =false;
 	public static boolean connectOk =false;
-	
+	private SecurityController securityController =  new SecurityController();
 	private JLabel Identitification;
 
 	public LoginView() {
@@ -87,9 +87,8 @@ public class LoginView {
 		JButton Connexion = new JButton("Connexion");
 		Connexion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SecurityController login = new SecurityController();
 				
-				if(SecurityController.loginRequest(Login_textField, pw)==true){
+				if(securityController.loginRequest(Login_textField, pw)!=0){
 					ident.setVisible(false);
 					} else {
 						System.out.println("test si faux");

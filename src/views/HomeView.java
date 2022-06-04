@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class HomeView {
 	
 	public JFrame frame;
-	private JDesktopPane desk;
+	static JDesktopPane desk;
 	
 	public HomeView() {
 		super();

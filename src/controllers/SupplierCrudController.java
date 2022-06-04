@@ -17,9 +17,9 @@ import services.DataConnection;
 
 public class SupplierCrudController {
 	
-	static Connection accessDataBase = null;
-	static ResultSet rs = null;
-	static PreparedStatement query = null;
+	private Connection accessDataBase = null;
+	private ResultSet rs = null;
+	private PreparedStatement query = null;
 
 	static boolean executeOk = false;
 	
@@ -34,7 +34,6 @@ public class SupplierCrudController {
 			query.setString(2, supplier.getSupplierName());
 			query.setString(3, supplier.getSupplierPhone());
 			query.setInt(4, supplier.getContactId());
-	System.out.println(query);
 
 			executeOk = query.execute();
 
@@ -44,7 +43,7 @@ public class SupplierCrudController {
 		return executeOk;
 	}
 	
-	public static ArrayList<Supplier> listSuppliers(){
+	public ArrayList<Supplier> listSuppliers(){
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Supplier> resultList = new ArrayList<Supplier>();
 		String query = "SELECT `sup_id`, `sup_name` FROM supplier";
@@ -67,7 +66,7 @@ public class SupplierCrudController {
 		return resultList;
 	}
 	
-	public static ArrayList<Supplier> selectedProvider (String name) throws SQLException {
+	public ArrayList<Supplier> selectedProvider (String name) throws SQLException {
 		System.out.println(name);
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Supplier> resultSelect = new ArrayList<Supplier>();
@@ -95,7 +94,7 @@ public class SupplierCrudController {
 		return resultSelect;
 	}
 	
-	public static ArrayList<Supplier> showAllProvider() {
+	public ArrayList<Supplier> showAllProvider() {
 		
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Supplier> result = new ArrayList<Supplier>();

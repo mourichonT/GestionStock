@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.management.relation.Role;
+
+import controllers.SecurityController;
 import models.User;
 
 
@@ -21,19 +24,18 @@ public class DataConnection {
 	//private static DataConnectionLogin login = new DataConnectionLogin();
 	//login.getLogin();
 	
-	private static User role = new User();
+	
 	
 
 	public static Connection openConnection() {
+		//User role.getRole();
 		
-	
-		String userRole = role.getRole();
-		System.out.println(userRole);
+		//System.out.println(userRole);
 		/* Parametres de connexion */
-		String url = "jdbc:mysql://127.0.0.1:3306/nesti";
+		String url = "jdbc:mysql://127.0.0.1:3306/nesti2";
 
-	 	String utilisateur = userRole;
-		String motDePasse = userRole;
+	 	String utilisateur = "admin";
+		String motDePasse = "admin";
 			try {
 				accessDataBase = DriverManager.getConnection(url, utilisateur, motDePasse);
 				System.out.println("try to connect...");

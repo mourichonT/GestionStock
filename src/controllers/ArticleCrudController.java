@@ -11,14 +11,16 @@ import java.util.logging.Logger;
 
 import javax.swing.JTextPane;
 
+import com.mysql.cj.jdbc.CallableStatement;
+
 import models.Article;
 import services.DataConnection;
 
 public class ArticleCrudController {
-	static Connection accessDataBase = null;
-	static ResultSet rs = null;
-	static PreparedStatement query = null;
-
+	private Connection accessDataBase = null;
+	private ResultSet rs = null;
+	private PreparedStatement query = null;
+	//private ArrayList<Article> result = new ArrayList<Article>();
 	static boolean executeOk = false;
 
 	public boolean addNewArticle(Article article) throws SQLException {
@@ -26,26 +28,20 @@ public class ArticleCrudController {
 		try {
 			accessDataBase = DataConnection.openConnection();
 
-			String requestAdd = "INSERT INTO `article` (name, supplier, creation_date, type, art_prov_id, art_price_id ) VALUES(?,?,?,?,?,?)";
+			String requestAdd = "INSERT INTO `article` (name, spec_art, supplier, creation_date, price_art, quantity_art, type_art_id, art_prov_id ) VALUES(?,?,?,?,?,?,?,?)";
 			query = accessDataBase.prepareStatement(requestAdd);
 			query.setString(1, article.getName());
-			query.setString(2, article.getFournisseur());
-			query.setString(3, article.getDateCreation());
-			query.setString(4, article.getType());
-			query.setInt(5, article.getFournisseurID());
-			query.setInt(6, article.getPriceId());
+			query.setString(2, article.getSpectArt());
+			query.setString(3, article.getFournisseur());
+			query.setString(4, article.getDateFormat());
+			query.setFloat(5, article.getPrice());
+			query.setInt(6, article.getQuantityArt());
+			query.setInt(7, article.getTypeId());
+			query.setInt(8, article.getFournisseurID());
 
 			executeOk = query.execute();
-
 		} catch (SQLException ex) {
-			System.out.println(article.getName());
-			System.out.println(article.getFournisseur());
-			System.out.println(article.getDateCreation());
-			System.out.println(article.getType());
-			System.out.println(article.getFournisseurID());
-			System.out.println(article.getPriceId());
-			
-			Logger.getLogger(DataConnection.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+			System.out.println(ex.getMessage());
 		}
 		return executeOk;
 	}
@@ -64,53 +60,101 @@ public class ArticleCrudController {
 		}
 	}
 
-	public static ArrayList<Article> showListArticle() {
+	public ArrayList<Article> showListArticle() {
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Article> result = new ArrayList<Article>();
-		String query = "SELECT * FROM article";
+		String query = "CALL getArticles()";
+		Article article = null;
 		try {
-			Statement stm = accessDataBase.createStatement();
-			ResultSet rs = stm.executeQuery(query);
-			Article article = null;
+			CallableStatement stm = (CallableStatement) accessDataBase.prepareCall(query);
+
+			// Statement stm = accessDataBase.createStatement();
+			ResultSet rs = stm.executeQuery();
+
+			System.out.println(stm);
 			while (rs.next()) {
 				article = new Article();
 				article.setID(rs.getInt("id_article"));
 				article.setName(rs.getString("name"));
-				article.setFournisseur(rs.getString("supplier"));
-				article.setDateCreation(rs.getString("creation_date"));
-				article.setType(rs.getString("type"));
+				article.setSpectArt(rs.getString("spec_art"));
+				article.setFournisseur(rs.getString("sup_name"));
+				article.setDateFormat(rs.getString("creation_date"));
+				article.setPrice(rs.getFloat("price_art"));
+				article.setQuantityArt(rs.getInt("quantity_art"));
+				article.setType(rs.getString("type_name"));
+				article.setFournisseurID(rs.getInt("art_prov_id"));
+				article.setPriceTTC(rs.getFloat("convert_ht_to_ttc(`price_art`)"));
 				result.add(article);
 			}
-			
+
 		} catch (Exception e) {
+
+			System.out.println(article.getID());
+			System.out.println(article.getName());
+			System.out.println(article.getSpectArt());
+			System.out.println(article.getFournisseur());
+			System.out.println(article.getDateFormat());
+			System.out.println(article.getPrice());
+			System.out.println(article.getQuantityArt());
+			System.out.println(article.getType());
+			System.out.println(article.getFournisseurID());
+			System.out.println(article.getPriceTTC());
+
 			System.err.println("erreur dans la recupération de la requete" + e);
 		}
 		return result;
 	}
-	
+
 	public void upDateArt(Article article) {
 		try {
 			accessDataBase = DataConnection.openConnection();
-			String requestUpDate = "UPDATE `article` SET `name`=?, `supplier` = ?, `type`=?  WHERE `id_article` = ?";
-			
-			query = accessDataBase.prepareStatement(requestUpDate);
-			query.setString(1, article.getName());
-			query.setString(2, article.getFournisseur());
-			query.setString(3, article.getType());
-			query.setInt(4, article.getID());
+			String requestUpDate = "CALL UpDateArticle(?,?,?,?,?,?,?,?)";
+			CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestUpDate);
+			// statement = accessDataBase.prepareStatement(requestUpDate);
+			statement.setString(1, article.getName());
+			statement.setString(2, article.getSpectArt());
+			statement.setString(3, article.getFournisseur());
+			statement.setFloat(4, article.getPrice());
+			statement.setInt(5, article.getQuantityArt());
+			statement.setString(6, article.getType());
+			statement.setString(7, article.getComment());
+			statement.setInt(8, article.getID());
 
-			System.out.println(query);
-			
-			System.out.println("modifier");
-			System.out.println(article.getName());
-			System.out.println(article.getFournisseur());
-			System.out.println(article.getType());
-			System.out.println(article.getID());
-
-			executeOk = query.execute();
+			executeOk = statement.execute();
 		} catch (SQLException ex) {
 			System.out.println(ex);
 		}
-		
+
 	}
+
+	/*public ArrayList<Article> getPriceInclTax(Float priceHtToInt) {
+		accessDataBase = DataConnection.openConnection();
+		// ArrayList<Article> result = new ArrayList<Article>();
+
+		try {
+
+			String requestGetPrice = "SELECT convert_ht_to_ttc(?)";
+			Article article = null;
+			CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestGetPrice);
+
+			statement.setFloat(1, priceHtToInt);
+
+			System.out.println("STM  " + statement);
+			System.out.println("priceHT  " + priceHtToInt);
+
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()) {
+				article = new Article();
+				article.setPriceTTC(rs.getFloat("convert_ht_to_ttc(" + priceHtToInt + ")"));
+				result.add(article);
+			}
+
+			System.out.println("price  " + article);
+
+		} catch (SQLException e) {
+			System.out.println(e);
+		}
+		return result;
+
+	}*/
 }

@@ -4,23 +4,97 @@ public class Article {
 
 	private int ID;
 	private String Name;
-	private String DateFormat;
-	private String Type;
+	private String SpectArt;
 	private String Fournisseur;
+	private String DateFormat;
+	private float Price;
+	private int QuantityArt;
+	private int TypeId;
+	private String Type;
 	private int FournisseurID;
-	private int PriceId;
+	private String Comment;
+	private Float priceTTC;
+	
+	
+	
 
-	
-	
-	public Article(int iD, String name, String dateFormat, String type, String fournisseur, int fournisseurID,
-			int priceId) {
+	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
+			int quantityArt, int typeId, int fournisseurID) {
 		ID = iD;
 		Name = name;
-		DateFormat = dateFormat;
-		Type = type;
+		SpectArt = spectArt;
 		Fournisseur = fournisseur;
+		DateFormat = dateFormat;
+		Price = price;
+		QuantityArt = quantityArt;
+		TypeId = typeId;
 		FournisseurID = fournisseurID;
-		PriceId = priceId;
+	}
+	
+	
+	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
+			int quantityArt, int typeId) {
+		ID = iD;
+		Name = name;
+		SpectArt = spectArt;
+		Fournisseur = fournisseur;
+		DateFormat = dateFormat;
+		Price = price;
+		QuantityArt = quantityArt;
+		TypeId = typeId;
+		
+	}
+	
+	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
+			int quantityArt, String type, int fournisseurID) {
+		
+		ID = iD;
+		Name = name;
+		SpectArt = spectArt;
+		Fournisseur = fournisseur;
+		DateFormat = dateFormat;
+		Price = price;
+		QuantityArt = quantityArt;
+		Type = type;
+		FournisseurID = fournisseurID;
+	}
+	public Article(
+			int iD, 
+			String name, 
+			String spectArt, 
+			String fournisseur, 
+			String dateFormat, 
+			float price,
+			int quantityArt) {
+
+		ID = iD;
+		Name = name;
+		SpectArt = spectArt;
+		Fournisseur = fournisseur;
+		DateFormat = dateFormat;
+		Price = price;
+		QuantityArt = quantityArt;
+		
+	}
+	public Article(
+			int iD, 
+			String name, 
+			String spectArt, 
+			String fournisseur, 
+			float price,
+			int quantityArt,
+			String type,
+			String comment) {
+
+		ID = iD;
+		Name = name;
+		SpectArt = spectArt;
+		Fournisseur = fournisseur;
+		Price = price;
+		QuantityArt = quantityArt;
+		Type =type;
+		Comment = comment;
+		
 	}
 
 	public Article() {
@@ -28,62 +102,126 @@ public class Article {
 	
 	}
 	
+
+
 	public int getID() {
 		return ID;
 	}
+
 	public void setID(int iD) {
 		ID = iD;
 	}
+
 	public String getName() {
 		return Name;
 	}
+
 	public void setName(String name) {
 		Name = name;
 	}
-	
-	public String getDateCreation() {
-		return DateFormat;
+
+	public String getSpectArt() {
+		return SpectArt;
 	}
 
-	public void setDateCreation(String dateFormat) {
-		DateFormat = dateFormat;
+	public void setSpectArt(String spectArt) {
+		SpectArt = spectArt;
 	}
 
-	public String getType() {
-		return Type;
-	}
-	public void setType(String type) {
-		Type = type;
-	}
 	public String getFournisseur() {
 		return Fournisseur;
 	}
+
 	public void setFournisseur(String fournisseur) {
 		Fournisseur = fournisseur;
 	}
-	
+
+	public String getDateFormat() {
+		return DateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		DateFormat = dateFormat;
+	}
+
+	public float getPrice() {
+		return Price;
+	}
+
+	public void setPrice(float price) {
+		Price = price;
+	}
+
+	public int getQuantityArt() {
+		return QuantityArt;
+	}
+
+	public void setQuantityArt(int quantityArt) {
+		QuantityArt = quantityArt;
+	}
+
+	public int getTypeId() {
+		return TypeId;
+	}
+
+	public void setTypeId(int typeId) {
+		TypeId = typeId;
+	}
+	public String getType() {
+		return Type;
+	}
+
+	public void setType(String type) {
+		Type = type;
+	}
 	public int getFournisseurID() {
 		return FournisseurID;
 	}
+
 	public void setFournisseurID(int fournisseurID) {
 		FournisseurID = fournisseurID;
 	}
-	public int getPriceId() {
-		return PriceId;
+
+	
+	public String getComment() {
+		return Comment;
 	}
-	public void setPriceId(int priceId) {
-		this.PriceId = priceId;
+
+
+	public void setComment(String comment) {
+		Comment = comment;
 	}
+
+
+	
+
+
+	public Float getPriceTTC() {
+		return priceTTC;
+	}
+
+
+	public void setPriceTTC(Float priceTTC) {
+		this.priceTTC = priceTTC;
+	}
+
+
 	@Override
 	public String toString() {
 		StringBuilder string = new StringBuilder();
 		string.append("Article [ID=").append(ID)
 		.append(", Name=").append(Name)
-		.append(", DateFormat=").append(DateFormat)
-		.append(", Type=").append(Type)
+		.append(", SpecArt=").append(SpectArt)
 		.append(", Fournisseur=").append(Fournisseur)
+		.append(", DateFormat=").append(DateFormat)
+		.append(", TypeId=").append(TypeId)
+		.append(", Type=").append(Type)
 		.append(", FournisseurID=").append(FournisseurID)
-		.append(", PriceId=").append(PriceId)
+		.append(", Price=").append(Price)
+		.append(", QuantityArt=").append(QuantityArt)
+		.append(", PriceId=").append(Price)
+		.append(", PriceTTC=").append(priceTTC)
+		.append(", Comment=").append(Comment)
 		.append(", toString()=").append(super.toString()).append("]");
 		
 		return string.toString();

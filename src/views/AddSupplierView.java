@@ -42,7 +42,8 @@ public class AddSupplierView extends JFrame {
 		private JTextField txtNameCont;
 		private String selectedItem;
 		private String[] listData =null;
-		
+		private SupplierCrudController supplierCrudController = new SupplierCrudController();
+
 	public String[] getListData() {
 			return listData;
 		}
@@ -114,7 +115,7 @@ public class AddSupplierView extends JFrame {
 		txtName.setColumns(10);
 		contentPane.add(txtName);
 		
-		ArrayList<Supplier> listSuppliers = SupplierCrudController.listSuppliers();
+		ArrayList<Supplier> listSuppliers = supplierCrudController.listSuppliers();
 		listData = new String [listSuppliers.size()];
 		
 		for (int i = 0; i < listSuppliers.size(); i++)
