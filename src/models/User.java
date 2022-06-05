@@ -5,7 +5,7 @@ public class User {
 	private int userId;
 	private String login;
 	private String password;
-	private String role;
+	public static String role;
 	
 	
 	public User(int userId, String login, String password, String role) {
@@ -53,7 +53,7 @@ public class User {
 	}
 
 
-	public String getRole() {
+	public static String getRole() {
 		return role;
 	}
 

@@ -9,54 +9,64 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 
 import com.mysql.cj.jdbc.CallableStatement;
 
 import models.Article;
+import models.User;
 import services.DataConnection;
 
 public class ArticleCrudController {
 	private Connection accessDataBase = null;
 	private ResultSet rs = null;
 	private PreparedStatement query = null;
-	//private ArrayList<Article> result = new ArrayList<Article>();
+	// private ArrayList<Article> result = new ArrayList<Article>();
 	static boolean executeOk = false;
 
-	public boolean addNewArticle(Article article) throws SQLException {
+	public boolean addNewArticle(Article article, String role) throws SQLException {
+		if (role == "admin") {
+			try {
+				accessDataBase = DataConnection.openConnection();
 
-		try {
-			accessDataBase = DataConnection.openConnection();
+				String requestAdd = "INSERT INTO `article` (name, spec_art, supplier, creation_date, price_art, quantity_art, type_art_id, art_prov_id ) VALUES(?,?,?,?,?,?,?,?)";
+				query = accessDataBase.prepareStatement(requestAdd);
+				query.setString(1, article.getName());
+				query.setString(2, article.getSpectArt());
+				query.setString(3, article.getFournisseur());
+				query.setString(4, article.getDateFormat());
+				query.setFloat(5, article.getPrice());
+				query.setInt(6, article.getQuantityArt());
+				query.setInt(7, article.getTypeId());
+				query.setInt(8, article.getFournisseurID());
 
-			String requestAdd = "INSERT INTO `article` (name, spec_art, supplier, creation_date, price_art, quantity_art, type_art_id, art_prov_id ) VALUES(?,?,?,?,?,?,?,?)";
-			query = accessDataBase.prepareStatement(requestAdd);
-			query.setString(1, article.getName());
-			query.setString(2, article.getSpectArt());
-			query.setString(3, article.getFournisseur());
-			query.setString(4, article.getDateFormat());
-			query.setFloat(5, article.getPrice());
-			query.setInt(6, article.getQuantityArt());
-			query.setInt(7, article.getTypeId());
-			query.setInt(8, article.getFournisseurID());
-
-			executeOk = query.execute();
-		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+				executeOk = query.execute();
+			} catch (SQLException ex) {
+				System.out.println(ex.getMessage());
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
 		}
 		return executeOk;
 	}
 
-	public void deleteArt(JTextPane textPaneID) throws SQLException {
-		try {
-			accessDataBase = DataConnection.openConnection();
-			String requestDelete = "DELETE FROM `article` WHERE `id_article` = ?";
-			query = accessDataBase.prepareStatement(requestDelete);
-			query.setString(1, textPaneID.getText());
+	public void deleteArt(JTextPane textPaneID, String role) throws SQLException {
+		if (role == "admin") {
 
-			executeOk = query.execute();
-			System.out.println("deleted");
-		} catch (SQLException ex) {
-			System.out.println(ex);
+			try {
+				accessDataBase = DataConnection.openConnection();
+				String requestDelete = "DELETE FROM `article` WHERE `id_article` = ?";
+				query = accessDataBase.prepareStatement(requestDelete);
+				query.setString(1, textPaneID.getText());
+
+				executeOk = query.execute();
+				System.out.println("deleted");
+			} catch (SQLException ex) {
+				System.out.println(ex);
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
 		}
 	}
 
@@ -67,8 +77,6 @@ public class ArticleCrudController {
 		Article article = null;
 		try {
 			CallableStatement stm = (CallableStatement) accessDataBase.prepareCall(query);
-
-			// Statement stm = accessDataBase.createStatement();
 			ResultSet rs = stm.executeQuery();
 
 			System.out.println(stm);
@@ -88,73 +96,35 @@ public class ArticleCrudController {
 			}
 
 		} catch (Exception e) {
-
-			System.out.println(article.getID());
-			System.out.println(article.getName());
-			System.out.println(article.getSpectArt());
-			System.out.println(article.getFournisseur());
-			System.out.println(article.getDateFormat());
-			System.out.println(article.getPrice());
-			System.out.println(article.getQuantityArt());
-			System.out.println(article.getType());
-			System.out.println(article.getFournisseurID());
-			System.out.println(article.getPriceTTC());
-
-			System.err.println("erreur dans la recupération de la requete" + e);
+				System.err.println("erreur dans la recupération de la requete" + e);
 		}
 		return result;
 	}
 
-	public void upDateArt(Article article) {
-		try {
-			accessDataBase = DataConnection.openConnection();
-			String requestUpDate = "CALL UpDateArticle(?,?,?,?,?,?,?,?)";
-			CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestUpDate);
-			// statement = accessDataBase.prepareStatement(requestUpDate);
-			statement.setString(1, article.getName());
-			statement.setString(2, article.getSpectArt());
-			statement.setString(3, article.getFournisseur());
-			statement.setFloat(4, article.getPrice());
-			statement.setInt(5, article.getQuantityArt());
-			statement.setString(6, article.getType());
-			statement.setString(7, article.getComment());
-			statement.setInt(8, article.getID());
+	public void upDateArt(Article article, String role) {
 
-			executeOk = statement.execute();
-		} catch (SQLException ex) {
-			System.out.println(ex);
-		}
+		if (role == "admin") {
+			try {
+				accessDataBase = DataConnection.openConnection();
+				String requestUpDate = "CALL UpDateArticle(?,?,?,?,?,?,?,?)";
+				CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestUpDate);
+				statement.setString(1, article.getName());
+				statement.setString(2, article.getSpectArt());
+				statement.setString(3, article.getFournisseur());
+				statement.setFloat(4, article.getPrice());
+				statement.setInt(5, article.getQuantityArt());
+				statement.setString(6, article.getType());
+				statement.setString(7, article.getComment());
+				statement.setInt(8, article.getID());
 
-	}
-
-	/*public ArrayList<Article> getPriceInclTax(Float priceHtToInt) {
-		accessDataBase = DataConnection.openConnection();
-		// ArrayList<Article> result = new ArrayList<Article>();
-
-		try {
-
-			String requestGetPrice = "SELECT convert_ht_to_ttc(?)";
-			Article article = null;
-			CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestGetPrice);
-
-			statement.setFloat(1, priceHtToInt);
-
-			System.out.println("STM  " + statement);
-			System.out.println("priceHT  " + priceHtToInt);
-
-			ResultSet rs = statement.executeQuery();
-			while (rs.next()) {
-				article = new Article();
-				article.setPriceTTC(rs.getFloat("convert_ht_to_ttc(" + priceHtToInt + ")"));
-				result.add(article);
+				executeOk = statement.execute();
+			} catch (SQLException ex) {
+				System.out.println(ex);
 			}
-
-			System.out.println("price  " + article);
-
-		} catch (SQLException e) {
-			System.out.println(e);
+		} else {
+			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
 		}
-		return result;
 
-	}*/
+	}
+
 }

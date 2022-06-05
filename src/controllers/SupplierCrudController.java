@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -16,38 +17,44 @@ import models.Supplier;
 import services.DataConnection;
 
 public class SupplierCrudController {
-	
+
 	private Connection accessDataBase = null;
 	private ResultSet rs = null;
 	private PreparedStatement query = null;
 
 	static boolean executeOk = false;
-	
-	public boolean addNewSupplier(Supplier supplier) throws SQLException {
 
-		try {
-			accessDataBase = DataConnection.openConnection();
-			//int parseID = Integer.parseInt(supplier.getSupplierContactId());
-			String requestAdd = "INSERT INTO `supplier` (sup_address, sup_name, sup_phone, sup_cont_id) VALUES(?,?,?,?)";
-			query = accessDataBase.prepareStatement(requestAdd);
-			query.setString(1, supplier.getSupplierAddress());
-			query.setString(2, supplier.getSupplierName());
-			query.setString(3, supplier.getSupplierPhone());
-			query.setInt(4, supplier.getContactId());
+	public boolean addNewSupplier(Supplier supplier, String role) throws SQLException {
 
-			executeOk = query.execute();
+		if (role == "admin") {
 
-		} catch (SQLException ex) {
-			Logger.getLogger(DataConnection.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+			try {
+				accessDataBase = DataConnection.openConnection();
+				String requestAdd = "INSERT INTO `supplier` (sup_address, sup_name, sup_phone, sup_cont_id) VALUES(?,?,?,?)";
+				query = accessDataBase.prepareStatement(requestAdd);
+				query.setString(1, supplier.getSupplierAddress());
+				query.setString(2, supplier.getSupplierName());
+				query.setString(3, supplier.getSupplierPhone());
+				query.setInt(4, supplier.getContactId());
+
+				executeOk = query.execute();
+
+			} catch (SQLException ex) {
+				Logger.getLogger(DataConnection.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
 		}
+
 		return executeOk;
 	}
-	
-	public ArrayList<Supplier> listSuppliers(){
+
+	public ArrayList<Supplier> listSuppliers() {
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Supplier> resultList = new ArrayList<Supplier>();
 		String query = "SELECT `sup_id`, `sup_name` FROM supplier";
-		
+
 		try {
 			Statement stm = accessDataBase.createStatement();
 			ResultSet rs = stm.executeQuery(query);
@@ -56,17 +63,17 @@ public class SupplierCrudController {
 				supplierList = new Supplier();
 				supplierList.setSupId(rs.getInt("sup_id"));
 				supplierList.setSupplierName(rs.getString("sup_name"));
-				
+
 				resultList.add(supplierList);
 			}
-			
+
 		} catch (Exception e) {
 			System.err.println("erreur dans la recupération de la requete" + e);
 		}
 		return resultList;
 	}
-	
-	public ArrayList<Supplier> selectedProvider (String name) throws SQLException {
+
+	public ArrayList<Supplier> selectedProvider(String name) throws SQLException {
 		System.out.println(name);
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Supplier> resultSelect = new ArrayList<Supplier>();
@@ -74,9 +81,9 @@ public class SupplierCrudController {
 		query = accessDataBase.prepareStatement(querySelect);
 		query.setString(1, name);
 		try {
-			
+
 			ResultSet rs = query.executeQuery();
-			
+
 			Supplier selection = null;
 			while (rs.next()) {
 				selection = new Supplier();
@@ -87,15 +94,15 @@ public class SupplierCrudController {
 				selection.setSupplierContact(rs.getString("sup_cont_id"));
 				resultSelect.add(selection);
 			}
-			
+
 		} catch (Exception e) {
 			System.err.println("erreur dans la recupération de la requete" + e);
 		}
 		return resultSelect;
 	}
-	
+
 	public ArrayList<Supplier> showAllProvider() {
-		
+
 		accessDataBase = DataConnection.openConnection();
 		ArrayList<Supplier> result = new ArrayList<Supplier>();
 		String query = "SELECT * FROM supplier";
@@ -112,43 +119,56 @@ public class SupplierCrudController {
 				supplier.setContactId(rs.getInt("sup_cont_id"));
 				result.add(supplier);
 			}
-			
+
 		} catch (Exception e) {
 			System.err.println("erreur dans la recupération de la requete" + e);
 		}
 		return result;
 	}
-	
-	public void deleteSup(String id) {
-		
-		try {
-			accessDataBase = DataConnection.openConnection();
-			String requestDelete = "DELETE FROM `supplier` WHERE `sup_id` = ?";
-			query = accessDataBase.prepareStatement(requestDelete);
-			query.setString(1, id);
-			System.out.println(query);
-			executeOk = query.execute();
-			System.out.println("deleted");
-		} catch (SQLException ex) {
-			System.out.println(ex);
-		}
-	}
-	public void upDateSup(Supplier supplier) {
-	try {
-		accessDataBase = DataConnection.openConnection();
-		String requestUpDate = "UPDATE `supplier` SET `sup_address`=?, `sup_name` = ?, `sup_phone`=?  WHERE `sup_id` = ?";
-		
-		query = accessDataBase.prepareStatement(requestUpDate);
-		query.setString(1, supplier.getSupplierAddress());
-		query.setString(2, supplier.getSupplierName());
-		query.setString(3, supplier.getSupplierPhone());
-		query.setInt(4, supplier.getSupId());
 
-		System.out.println(query);
-		
-		executeOk = query.execute();
-		} catch (SQLException ex) {
-		System.out.println(ex);
+	public void deleteSup(String id, String role) {
+		if (role == "admin") {
+			try {
+				accessDataBase = DataConnection.openConnection();
+				String requestDelete = "DELETE FROM `supplier` WHERE `sup_id` = ?";
+				query = accessDataBase.prepareStatement(requestDelete);
+				query.setString(1, id);
+				System.out.println(query);
+				executeOk = query.execute();
+				System.out.println("deleted");
+			} catch (SQLException ex) {
+				System.out.println(ex);
 			}
+
+		} else {
+			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
+		}
+
+	}
+
+	public void upDateSup(Supplier supplier, String role) {
+		if (role == "admin") {
+
+			try {
+				accessDataBase = DataConnection.openConnection();
+				String requestUpDate = "UPDATE `supplier` SET `sup_address`=?, `sup_name` = ?, `sup_phone`=?  WHERE `sup_id` = ?";
+
+				query = accessDataBase.prepareStatement(requestUpDate);
+				query.setString(1, supplier.getSupplierAddress());
+				query.setString(2, supplier.getSupplierName());
+				query.setString(3, supplier.getSupplierPhone());
+				query.setInt(4, supplier.getSupId());
+
+				System.out.println(query);
+
+				executeOk = query.execute();
+			} catch (SQLException ex) {
+				System.out.println(ex);
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
+		}
+
 	}
 }

@@ -11,6 +11,7 @@ import controllers.TypeCrudController;
 import models.Article;
 import models.Supplier;
 import models.Type;
+import models.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -166,7 +167,6 @@ public class AddArticleView extends JFrame {
 		for (int i = 0; i < listType.size(); i++) {
 			listDataType[i] = listType.get(i).getTypeName();
 			IdSTypSelect[i] = listType.get(i).getTypeId();
-			// listDataType[1] = listType.get(i).getTypeId();
 		}
 
 		final JComboBox<Object> typList = new JComboBox(listDataType);
@@ -225,9 +225,8 @@ public class AddArticleView extends JFrame {
 					try {
 						ArticleCrudController addArt = new ArticleCrudController();
 						JOptionPane.showMessageDialog(null, "enregistré");
-						saveOk = addArt.addNewArticle(article);
+						saveOk = addArt.addNewArticle(article, User.role);
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					contentPane.removeAll();

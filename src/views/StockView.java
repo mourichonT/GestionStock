@@ -19,6 +19,7 @@ import models.Article;
 import models.Contact;
 import models.Supplier;
 import models.Type;
+import models.User;
 import services.ArticleRepository;
 
 import javax.swing.border.BevelBorder;
@@ -61,8 +62,8 @@ public class StockView extends JInternalFrame {
 	private TypeCrudController typeCrudController = new TypeCrudController();
 
 	
-	
 	public StockView () throws SQLException, PropertyVetoException {
+		
 		getContentPane().setBackground(UIManager.getColor("Button.background"));
 		setClosable(true);
 		setTitle("lists");
@@ -433,14 +434,6 @@ public class StockView extends JInternalFrame {
 		lblmontant.setBounds(191, 74, 92, 13);
 		panelInfoPrix.add(lblmontant);
 		
-		JTextPane annonceTriger = new JTextPane();
-		annonceTriger.setDisabledTextColor(new Color(220, 20, 60));
-		annonceTriger.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		annonceTriger.setEditable(false);
-		annonceTriger.setEnabled(false);
-		annonceTriger.setBounds(496, 20, 210, 86);
-		panelInfoPrix.add(annonceTriger);
-		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(439, 112, 0, -62);
 		panelInfoPrix.add(separator);
@@ -580,7 +573,7 @@ public class StockView extends JInternalFrame {
 					try {
 						int reply = JOptionPane.showConfirmDialog(null, "êtes-vous sur de vouloir supprimer cet article", TITLE_PROPERTY, JOptionPane.YES_NO_OPTION);
 						if (reply == JOptionPane.YES_OPTION) {
-							deleteArticle.deleteArt(textPaneID);
+							deleteArticle.deleteArt(textPaneID, User.role);
 							
 							}else {
 						    JOptionPane.showMessageDialog(null, "ok");
@@ -621,7 +614,7 @@ public class StockView extends JInternalFrame {
 				Article article = new Article(id,name,spec,supName, price,quantity, TypId, comment);
 	
 				ArticleCrudController upDateArticle = new ArticleCrudController();
-				upDateArticle.upDateArt(article);
+				upDateArticle.upDateArt(article, User.role);
 			}
 		});
 		btnModify.setBounds(400, 173, 180, 21);

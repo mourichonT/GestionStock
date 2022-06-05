@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import java.awt.Font;
 
 import javax.swing.*;
+
+import models.User;
+
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
@@ -15,6 +18,8 @@ public class HomeView {
 	
 	public HomeView() {
 		super();
+		String userRole = User.getRole();
+		System.out.println(userRole);
 		initialize();
 	}
 	
