@@ -154,7 +154,7 @@ public class SupplierView extends JInternalFrame {
 						int contId = (Integer) dataSuppliers[index][4];
 
 						Supplier supplier = new Supplier(id, address, supplierName, phone, contId);
-						modify.upDateSup(supplier, User.role);
+						modify.upDateSup(supplier);
 					}
 				});
 
@@ -240,6 +240,11 @@ public class SupplierView extends JInternalFrame {
 		btnAdd.setBounds(new Rectangle(50, 50, 50, 50));
 		btnAdd.setBorderPainted(false);
 		btnAdd.setBackground(new Color(0, 102, 0));
+		if (User.role.equals("admin")) {
+			btnAdd.setEnabled(true);
+		} else {
+			btnAdd.setEnabled(false);
+		}
 		btnAdd.setBounds(56, 142, 104, 21);
 		getContentPane().add(btnAdd);
 
@@ -276,6 +281,11 @@ public class SupplierView extends JInternalFrame {
 		btnDelete.setBorderPainted(false);
 		btnDelete.setBackground(new Color(204, 0, 51));
 		btnDelete.setBounds(56, 173, 104, 21);
+		if (User.role.equals("admin")) {
+			btnDelete.setEnabled(true);
+		} else {
+			btnDelete.setEnabled(false);
+		}
 		getContentPane().add(btnDelete);
 
 		JButton btnModifier = new JButton("Effacer la recherche");
@@ -283,7 +293,6 @@ public class SupplierView extends JInternalFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				try {
-
 					SupplierView.pl = new SupplierView(null);
 					HomeView.desk.add(pl);
 					textAreaCommentCont.setText(" ");
@@ -295,7 +304,6 @@ public class SupplierView extends JInternalFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-
 			}
 		});
 		btnModifier.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -311,8 +319,6 @@ public class SupplierView extends JInternalFrame {
 			public void propertyChange(PropertyChangeEvent evt) {
 				String searchCont = searchContact.getText().toLowerCase();
 				filter(searchCont, modelContact);
-				// modelContact.ListSelectModel(index);
-				// ZStextAreaCommentCont.setText((dataContacts[index][7]).toString());
 			}
 		});
 		searchContact.addKeyListener(new KeyAdapter() {
@@ -320,7 +326,6 @@ public class SupplierView extends JInternalFrame {
 			public void keyReleased(KeyEvent e) {
 				String searchCont = searchContact.getText().toLowerCase();
 				filter(searchCont, modelContact);
-
 			}
 		});
 		searchContact.setColumns(10);
@@ -332,7 +337,6 @@ public class SupplierView extends JInternalFrame {
 			public void propertyChange(PropertyChangeEvent evt) {
 				String search = searchSupplier.getText().toLowerCase();
 				filter(search, modelSup);
-
 			}
 		});
 		searchSupplier.addKeyListener(new KeyAdapter() {
@@ -340,7 +344,6 @@ public class SupplierView extends JInternalFrame {
 			public void keyReleased(KeyEvent e) {
 				String search = searchSupplier.getText().toLowerCase();
 				filter(search, modelSup);
-
 			}
 		});
 		searchSupplier.setColumns(10);

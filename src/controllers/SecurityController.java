@@ -1,5 +1,6 @@
 package controllers;
 
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,13 +30,14 @@ public class SecurityController {
 		boolean connectOk = false;
 		int IdUser = 0;
 		resultRole = new ArrayList<User>();
-
+		String passwordHashed = doHashing(pw);
 		String request = "CALL login(?,?)";
 			try {
 				queryConnec = accessDataBase.prepareStatement(request);
 				queryConnec.setString(1, login_textField.getText());
-				queryConnec.setString(2,  new String(pw.getPassword()));
+				queryConnec.setString(2, new String(passwordHashed));
 				
+				System.out.println("query      "+ queryConnec);
 				rs = queryConnec.executeQuery();
 				
 				while (rs.next()) {
@@ -90,4 +92,34 @@ public class SecurityController {
 	
 	return resultRole;
 	}
+	
+	
+	public String doHashing(JPasswordField pw) {
+		
+		String password = new String(pw.getPassword());
+		System.out.println("password   " + password);
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA");
+			md.update(password.getBytes());
+			byte[] resultByteArray = md.digest();
+			StringBuilder sb = new StringBuilder();
+			
+			for (byte b : resultByteArray ) {
+				System.out.println("byte   : " + b);
+				sb.append(String.format("%x",b));
+			}
+			
+			System.out.println("stringBuilder   : " +sb);
+			return sb.toString();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+		return "";
+	}
+
+	
+	
 }

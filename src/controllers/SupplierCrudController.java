@@ -146,8 +146,7 @@ public class SupplierCrudController {
 
 	}
 
-	public void upDateSup(Supplier supplier, String role) {
-		if (role == "admin") {
+	public void upDateSup(Supplier supplier) {
 
 			try {
 				accessDataBase = DataConnection.openConnection();
@@ -166,9 +165,7 @@ public class SupplierCrudController {
 				System.out.println(ex);
 			}
 
-		} else {
-			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
-		}
+		
 
 	}
 }

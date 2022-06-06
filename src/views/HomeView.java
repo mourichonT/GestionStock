@@ -18,8 +18,6 @@ public class HomeView {
 	
 	public HomeView() {
 		super();
-		String userRole = User.getRole();
-		System.out.println(userRole);
 		initialize();
 	}
 	
@@ -67,7 +65,7 @@ public class HomeView {
 		
 		frame.getContentPane().add(desk);
 		providers.setFont(new Font("Tahoma", Font.PLAIN, 20));						
-		providers.setBounds(447, 25, 205, 58);
+		providers.setBounds(585, 31, 205, 58);
 		frame.getContentPane().add(providers);
 
 		JButton stock = new JButton("Stock");
@@ -87,8 +85,35 @@ public class HomeView {
 		});
 
 		stock.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		stock.setBounds(693, 25, 205, 58);
+		stock.setBounds(980, 31, 205, 58);
 		frame.getContentPane().add(stock);
+		
+		JButton user = new JButton("Utilisateur");
+		if (User.role.equals("admin")) {
+			user.setEnabled(true);
+		} else {
+			user.setEnabled(false);
+		}
+		user.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {	
+				desk.removeAll();
+				desk.repaint();
+				try {
+					ManagementConsoleViews mgv = new ManagementConsoleViews();
+					desk.add(mgv);
+					mgv.show();
+				} catch (PropertyVetoException e1) {
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}				
+			}
+		});
+		frame.getContentPane().add(user);
+		
+		user.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		user.setBounds(190, 31, 205, 58);
+		frame.getContentPane().add(user);
 		
 		
 

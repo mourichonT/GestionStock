@@ -96,33 +96,30 @@ public class ArticleCrudController {
 			}
 
 		} catch (Exception e) {
-				System.err.println("erreur dans la recupération de la requete" + e);
+			System.err.println("erreur dans la recupération de la requete" + e);
 		}
 		return result;
 	}
 
-	public void upDateArt(Article article, String role) {
+	public void upDateArt(Article article) {
 
-		if (role == "admin") {
-			try {
-				accessDataBase = DataConnection.openConnection();
-				String requestUpDate = "CALL UpDateArticle(?,?,?,?,?,?,?,?)";
-				CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestUpDate);
-				statement.setString(1, article.getName());
-				statement.setString(2, article.getSpectArt());
-				statement.setString(3, article.getFournisseur());
-				statement.setFloat(4, article.getPrice());
-				statement.setInt(5, article.getQuantityArt());
-				statement.setString(6, article.getType());
-				statement.setString(7, article.getComment());
-				statement.setInt(8, article.getID());
-
-				executeOk = statement.execute();
-			} catch (SQLException ex) {
-				System.out.println(ex);
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Vous n'avez pas les autorisation necessaire");
+		try {
+			accessDataBase = DataConnection.openConnection();
+			String requestUpDate = "CALL UpDateArticle(?,?,?,?,?,?,?,?,?)";
+			CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestUpDate);
+			statement.setString(1, article.getName());
+			statement.setString(2, article.getSpectArt());
+			statement.setString(3, article.getFournisseur());
+			statement.setFloat(4, article.getPrice());
+			statement.setInt(5, article.getQuantityArt());
+			statement.setString(6, article.getType());
+			statement.setString(7, article.getComment());
+			statement.setInt(8, article.getID());
+			statement.setInt(9, article.getUserId());
+			
+			executeOk = statement.execute();
+		} catch (SQLException ex) {
+			System.out.println(ex);
 		}
 
 	}

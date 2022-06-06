@@ -14,9 +14,7 @@ public class Article {
 	private int FournisseurID;
 	private String Comment;
 	private Float priceTTC;
-	
-	
-	
+	private int UserId;
 
 	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
 			int quantityArt, int typeId, int fournisseurID) {
@@ -30,8 +28,7 @@ public class Article {
 		TypeId = typeId;
 		FournisseurID = fournisseurID;
 	}
-	
-	
+
 	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
 			int quantityArt, int typeId) {
 		ID = iD;
@@ -42,12 +39,12 @@ public class Article {
 		Price = price;
 		QuantityArt = quantityArt;
 		TypeId = typeId;
-		
+
 	}
-	
+
 	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
 			int quantityArt, String type, int fournisseurID) {
-		
+
 		ID = iD;
 		Name = name;
 		SpectArt = spectArt;
@@ -58,13 +55,8 @@ public class Article {
 		Type = type;
 		FournisseurID = fournisseurID;
 	}
-	public Article(
-			int iD, 
-			String name, 
-			String spectArt, 
-			String fournisseur, 
-			String dateFormat, 
-			float price,
+
+	public Article(int iD, String name, String spectArt, String fournisseur, String dateFormat, float price,
 			int quantityArt) {
 
 		ID = iD;
@@ -74,17 +66,11 @@ public class Article {
 		DateFormat = dateFormat;
 		Price = price;
 		QuantityArt = quantityArt;
-		
+
 	}
-	public Article(
-			int iD, 
-			String name, 
-			String spectArt, 
-			String fournisseur, 
-			float price,
-			int quantityArt,
-			String type,
-			String comment) {
+
+	public Article(int iD, String name, String spectArt, String fournisseur, float price, int quantityArt,String comment, String type, int userId
+			) {
 
 		ID = iD;
 		Name = name;
@@ -92,16 +78,16 @@ public class Article {
 		Fournisseur = fournisseur;
 		Price = price;
 		QuantityArt = quantityArt;
-		Type =type;
+		Type = type;
+		UserId = userId;
 		Comment = comment;
-		
+
 	}
 
 	public Article() {
 		super();
-	
+
 	}
-	
 
 
 	public int getID() {
@@ -167,6 +153,7 @@ public class Article {
 	public void setTypeId(int typeId) {
 		TypeId = typeId;
 	}
+
 	public String getType() {
 		return Type;
 	}
@@ -174,6 +161,7 @@ public class Article {
 	public void setType(String type) {
 		Type = type;
 	}
+
 	public int getFournisseurID() {
 		return FournisseurID;
 	}
@@ -182,51 +170,42 @@ public class Article {
 		FournisseurID = fournisseurID;
 	}
 
-	
 	public String getComment() {
 		return Comment;
 	}
-
 
 	public void setComment(String comment) {
 		Comment = comment;
 	}
 
-
-	
-
-
 	public Float getPriceTTC() {
 		return priceTTC;
 	}
-
 
 	public void setPriceTTC(Float priceTTC) {
 		this.priceTTC = priceTTC;
 	}
 
+	public int getUserId() {
+		return UserId;
+	}
+
+	public void setUserId(int userId) {
+		this.UserId = userId;
+	}
 
 	@Override
 	public String toString() {
 		StringBuilder string = new StringBuilder();
-		string.append("Article [ID=").append(ID)
-		.append(", Name=").append(Name)
-		.append(", SpecArt=").append(SpectArt)
-		.append(", Fournisseur=").append(Fournisseur)
-		.append(", DateFormat=").append(DateFormat)
-		.append(", TypeId=").append(TypeId)
-		.append(", Type=").append(Type)
-		.append(", FournisseurID=").append(FournisseurID)
-		.append(", Price=").append(Price)
-		.append(", QuantityArt=").append(QuantityArt)
-		.append(", PriceId=").append(Price)
-		.append(", PriceTTC=").append(priceTTC)
-		.append(", Comment=").append(Comment)
-		.append(", toString()=").append(super.toString()).append("]");
-		
+		string.append("Article [ID=").append(ID).append(", Name=").append(Name).append(", SpecArt=").append(SpectArt)
+				.append(", Fournisseur=").append(Fournisseur).append(", DateFormat=").append(DateFormat)
+				.append(", TypeId=").append(TypeId).append(", Type=").append(Type).append(", FournisseurID=")
+				.append(FournisseurID).append(", Price=").append(Price).append(", QuantityArt=").append(QuantityArt)
+				.append(", PriceId=").append(Price).append(", PriceTTC=").append(priceTTC).append(", Comment=")
+				.append(", UserId=").append(UserId).append(Comment).append(", toString()=").append(super.toString())
+				.append("]");
+
 		return string.toString();
 	}
-	
-	
-	
+
 }
