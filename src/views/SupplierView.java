@@ -379,7 +379,6 @@ public class SupplierView extends JInternalFrame {
 
 			btnreturn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("ID ENREGISTRE " + StockView.index);
 					StockView.flagReturn = false;
 
 					SupplierView.pl.setVisible(false);

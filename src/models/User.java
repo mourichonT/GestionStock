@@ -11,11 +11,11 @@ public class User {
 	private int idUser;
 	private String userName;
 	private String userFName;
+	private int roleId;
 	
 
 
 	public User(int userId, String login, String password, String userName, String userFName, String role ) {
-		super();
 		this.login = login;
 		this.password = password;
 		this.userName = userName;
@@ -23,9 +23,32 @@ public class User {
 		this.userRole = role;
 		this.idUser = userId;
 	}
-	public User( int idUser, String userName, String userFName, String role, String password) {
+	public User( int idUser, String userName, String userFName, String role) {
 		super();
 		this.idUser = idUser;
+		this.userName = userName;
+		this.userFName = userFName;
+		this.userRole = role;
+		
+	}
+	public User( int idUser, String password) {
+		super();
+		this.idUser = idUser;
+		this.password = password;
+	}
+	
+	public User( String Login, String userName, String userFName, String password, String role) {
+		super();
+		this.login = Login;
+		this.password = password;
+		this.userName = userName;
+		this.userFName = userFName;
+		this.userRole = role;
+		
+	}
+	
+	public User(String userName, String userFName, String role, String password) {
+		
 		this.password = password;
 		this.userName = userName;
 		this.userFName = userFName;
@@ -119,11 +142,17 @@ public class User {
 	}
 
 
+	public int getRoleId() {
+		return roleId;
+	}
+	public void setRoleId(int roleId) {
+		this.roleId = roleId;
+	}
 	@Override
 	public String toString() {
 		StringBuilder string = new StringBuilder();
 		string.append("User [idUser=").append(idUser).append(", login=").append(login).append(", userRole=").append(userRole)
-				.append(", userName=").append(userName).append(", userFName=").append(userFName)
+				.append(", userName=").append(userName).append(", userFName=").append(userFName).append(roleId).append(", roleId=")
 				.append(", toString()=").append(super.toString())
 				.append("]");
 

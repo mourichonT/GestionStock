@@ -91,7 +91,7 @@ public class LoginView {
 				if(securityController.loginRequest(Login_textField, pw)!=0){
 					ident.setVisible(false);
 					} else {
-						System.out.println("test si faux");
+						System.out.println("le mot de passe ou le login est incorrect");
 						Login_textField.setText("");
 						pw.setText("");
 					}

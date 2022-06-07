@@ -417,7 +417,7 @@ public class StockView extends JInternalFrame {
 
 		JLabel lblQuantity = new JLabel("Quantit\u00E9 en Stock :");
 		lblQuantity.setForeground(Color.GRAY);
-		lblQuantity.setBounds(191, 51, 92, 13);
+		lblQuantity.setBounds(191, 51, 118, 13);
 		panelInfoPrix.add(lblQuantity);
 
 		JLabel lblPriceTTC = new JLabel("Prix TTC :");
@@ -634,6 +634,17 @@ public class StockView extends JInternalFrame {
 
 				ArticleCrudController upDateArticle = new ArticleCrudController();
 				upDateArticle.upDateArt(article);
+				
+				StockView skv;
+				try {
+					skv = new StockView();
+					HomeView.desk.add(skv);
+					skv.show();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				} catch (PropertyVetoException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
 

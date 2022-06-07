@@ -24,14 +24,24 @@ public class Supplier {
 		super();
 	}
 
-	public Supplier(int supId, String supplierAddress, String supplierName, String supplierPhone, int contactId) {
+	public Supplier(String supplierAddress, String supplierName, String supplierPhone) {
+		this.supplierAddress = supplierAddress;
+		this.supplierName = supplierName;
+		this.supplierPhone = supplierPhone;
+	}
+
+	
+	public Supplier(int supId, String supplierAddress, String supplierName, String supplierPhone,
+			int supplierContactId) {
+		super();
 		this.supId = supId;
 		this.supplierAddress = supplierAddress;
 		this.supplierName = supplierName;
 		this.supplierPhone = supplierPhone;
-		this.contactId = contactId;
-	}
+		this.contactId = supplierContactId;
 
+	}
+	
 	public int getSupId() {
 		return supId;
 	}

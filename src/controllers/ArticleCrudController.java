@@ -26,7 +26,7 @@ public class ArticleCrudController {
 	static boolean executeOk = false;
 
 	public boolean addNewArticle(Article article, String role) throws SQLException {
-		if (role == "admin") {
+		if (role.equals("admin")) {
 			try {
 				accessDataBase = DataConnection.openConnection();
 
@@ -52,8 +52,8 @@ public class ArticleCrudController {
 	}
 
 	public void deleteArt(JTextPane textPaneID, String role) throws SQLException {
-		if (role == "admin") {
-
+		System.out.println(role);
+		if (role.equals("admin") ) {
 			try {
 				accessDataBase = DataConnection.openConnection();
 				String requestDelete = "DELETE FROM `article` WHERE `id_article` = ?";

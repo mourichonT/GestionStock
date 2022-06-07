@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -28,6 +29,7 @@ import controllers.ArticleCrudController;
 import controllers.SecurityController;
 import controllers.UserCrudController;
 import models.Article;
+import models.RoleUser;
 import models.Type;
 import models.User;
 import javax.swing.JPanel;
@@ -54,7 +56,7 @@ import javax.swing.border.MatteBorder;
 public class ManagementConsoleViews extends JInternalFrame {
 	private ArrayList<User> users = null;
 	private ArrayList<User> Rolelist = null;
-	private ArrayList<User> RolelistView = null;
+	private ArrayList<RoleUser> RolelistView = null;
 	private int index = 0;
 	private int idSelected = 0;
 	private UserCrudController userCrudController = new UserCrudController();
@@ -63,9 +65,11 @@ public class ManagementConsoleViews extends JInternalFrame {
 	private TableModel tabModel;
 	private String selectedItemRole;
 	private boolean flagShowPwd = false;
-	private UserCrudController changedUser = new UserCrudController ();
+	private boolean flagSelected = false;
+	private UserCrudController changedUser = new UserCrudController();
 	private SecurityController sc = new SecurityController();
-	
+	boolean flag = false;
+
 	public ManagementConsoleViews() throws SQLException, PropertyVetoException {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 
@@ -184,25 +188,16 @@ public class ManagementConsoleViews extends JInternalFrame {
 		textPaneName.setBounds(145, 111, 178, 21);
 		panelUser.add(textPaneName);
 
-		JButton btnAdd = new JButton("Ajouter");
-		btnAdd.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnAdd.setForeground(Color.WHITE);
-		btnAdd.setBounds(new Rectangle(50, 50, 50, 50));
-		btnAdd.setBorderPainted(false);
-		btnAdd.setBackground(new Color(0, 102, 0));
-		btnAdd.setBounds(188, 199, 92, 21);
-		panelUser.add(btnAdd);
-
 		JLabel labelRole = new JLabel("Role :");
 		labelRole.setForeground(Color.GRAY);
 		labelRole.setBounds(10, 157, 80, 13);
 		panelUser.add(labelRole);
 
-		Rolelist = userCrudController.showListUsers();
-		final String[] listDataRole = new String[Rolelist.size()];
+		RolelistView = userCrudController.selectRole();
+		final String[] listDataRole = new String[RolelistView.size()];
 
-		for (int i = 0; i < Rolelist.size(); i++) {
-			listDataRole[i] = Rolelist.get(i).getUserRole();
+		for (int i = 0; i < RolelistView.size(); i++) {
+			listDataRole[i] = RolelistView.get(i).getUserRole();
 		}
 
 		final JComboBox<Object> listRole = new JComboBox(listDataRole);
@@ -237,9 +232,7 @@ public class ManagementConsoleViews extends JInternalFrame {
 		tbtnpwd1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean selected = tbtnpwd1.getModel().isSelected();
-				System.out.println("Action - selected=" + selected + "\n");
 				pw1.setEchoChar(selected ? '\u0000' : (Character) UIManager.get("PasswordField.echoChar"));
-				System.out.println("toto");
 			}
 		});
 
@@ -254,9 +247,7 @@ public class ManagementConsoleViews extends JInternalFrame {
 		tbtnpwd2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean selected = tbtnpwd2.getModel().isSelected();
-				System.out.println("Action - selected=" + selected + "\n");
 				pw2.setEchoChar(selected ? '\u0000' : (Character) UIManager.get("PasswordField.echoChar"));
-				System.out.println("toto");
 			}
 		});
 
@@ -264,6 +255,8 @@ public class ManagementConsoleViews extends JInternalFrame {
 		model.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+
+				flagSelected = true;
 				index = model.getSelectedRow();
 				tabModel = model.getModel();
 				String userLogin = tabModel.getValueAt(index, 1).toString();
@@ -274,15 +267,13 @@ public class ManagementConsoleViews extends JInternalFrame {
 				try {
 					RolelistView = userCrudController.listRole(nameRole);
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				roleListSelected = new Object[RolelistView.size()];
 				for (int i = 0; i < RolelistView.size(); i++) {
 					roleListSelected = new Object[2];
-					roleListSelected[0] = RolelistView.get(i).getIdUser();
+					roleListSelected[0] = RolelistView.get(i).getRoleIdUser();
 					roleListSelected[1] = RolelistView.get(i).getUserRole();
-					// dataRole[i] = roleListSelected;
 				}
 
 				textPaneLogin.setText(userLogin);
@@ -291,6 +282,8 @@ public class ManagementConsoleViews extends JInternalFrame {
 				listRole.setSelectedItem((roleListSelected[1]).toString());
 				pw1.setText(null);
 				pw2.setText(null);
+
+				flag = true;
 			}
 		});
 		model.setFillsViewportHeight(true);
@@ -311,8 +304,7 @@ public class ManagementConsoleViews extends JInternalFrame {
 		JButton btnModify = new JButton("Valider les changements");
 		btnModify.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				idSelected = (Integer)tabModel.getValueAt(index, 0);
-				System.out.println("ID selected    " +idSelected);
+				idSelected = (Integer) tabModel.getValueAt(index, 0);
 				String changedFName = textPaneFName.getText().toString();
 				String changedName = textPaneName.getText().toString();
 				String changedRole = selectedItemRole;
@@ -323,21 +315,119 @@ public class ManagementConsoleViews extends JInternalFrame {
 					System.out.println("Prénom n'a pas était saisie");
 				} else if (changedName.isEmpty()) {
 					System.out.println("Nom n'a pas était saisie");
-				} else if (changedPwd.isEmpty()) {
+					/*
+					 * } else if (changedPwd.isEmpty()) {
+					 * System.out.println("Le mot de passe est vide "); } else if
+					 * (!changedPwd.equals(changedPwdConf)) {
+					 * System.out.println("Les mots de passes ne sont pas identique ");
+					 */
+				} else {
+
+					String newPassWordString = sc.doHashing(pw1);
+
+					User userSelected = new User(idSelected, changedName, changedFName, changedRole);
+					changedUser.updateUser(userSelected);
+					ManagementConsoleViews mgv;
+					try {
+						mgv = new ManagementConsoleViews();
+						HomeView.desk.add(mgv);
+						mgv.show();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					} catch (PropertyVetoException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		btnModify.setBounds(145, 230, 180, 21);
+		panelUser.add(btnModify);
+
+		JButton btnChangerMotDe = new JButton("Changer mot de passe");
+		btnChangerMotDe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				idSelected = (Integer) tabModel.getValueAt(index, 0);
+				String changedPwd = new String(pw1.getPassword());
+				String changedPwdConf = new String(pw2.getPassword());
+
+				if (changedPwd.isEmpty() || changedPwdConf.isEmpty()) {
 					System.out.println("Le mot de passe est vide ");
 				} else if (!changedPwd.equals(changedPwdConf)) {
 					System.out.println("Les mots de passes ne sont pas identique ");
 				} else {
-					
+
 					String newPassWordString = sc.doHashing(pw1);
-					
-					User userSelected = new User(idSelected, changedName, changedFName, changedRole, newPassWordString );
-					changedUser.updateUser(userSelected);
+
+					User userSelected = new User(idSelected, newPassWordString);
+					changedUser.changedPassWord(userSelected);
 				}
 			}
 		});
-		btnModify.setBounds(533, 249, 180, 21);
-		panelUser.add(btnModify);
+		btnChangerMotDe.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnChangerMotDe.setForeground(Color.WHITE);
+		btnChangerMotDe.setBorderPainted(false);
+		btnChangerMotDe.setBackground(new Color(0, 102, 0));
+		btnChangerMotDe.setBounds(535, 132, 139, 21);
+		panelUser.add(btnChangerMotDe);
+
+		JButton btnAdd = new JButton("Ajouter");
+		btnAdd.setBounds(491, 64, 92, 21);
+		getContentPane().add(btnAdd);
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				AddUserView addUser = new AddUserView();
+				addUser.setVisible(true);
+			}
+		});
+		btnAdd.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnAdd.setForeground(Color.WHITE);
+		btnAdd.setBorderPainted(false);
+		btnAdd.setBackground(new Color(0, 102, 0));
+
+		JButton btnDelete = new JButton("Supprimer");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				idSelected = (Integer) tabModel.getValueAt(index, 0);
+
+				if (flag) {
+					UserCrudController removeUser = new UserCrudController();
+					try {
+						int reply = JOptionPane.showConfirmDialog(null,
+								"êtes-vous sur de vouloir supprimer cet utilisateur", TITLE_PROPERTY,
+								JOptionPane.YES_NO_OPTION);
+						if (reply == JOptionPane.YES_OPTION) {
+							removeUser.deleteUser(idSelected, User.role);
+							ManagementConsoleViews mgv;
+							try {
+								mgv = new ManagementConsoleViews();
+								HomeView.desk.add(mgv);
+								mgv.show();
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+							} catch (PropertyVetoException e1) {
+								e1.printStackTrace();
+							}
+						} else {
+							JOptionPane.showMessageDialog(null, "ok");
+							System.exit(0);
+						}
+
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "veuillez selectionner un article supprimer");
+				}
+			}
+		});
+		btnDelete.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnDelete.setForeground(Color.WHITE);
+		btnDelete.setBounds(new Rectangle(50, 50, 50, 50));
+		btnDelete.setBorderPainted(false);
+		btnDelete.setBackground(new Color(204, 0, 51));
+		btnDelete.setBounds(368, 64, 113, 21);
+		getContentPane().add(btnDelete);
 
 		removeTitleBar();
 	}

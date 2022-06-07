@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
@@ -226,6 +227,17 @@ public class AddArticleView extends JFrame {
 						ArticleCrudController addArt = new ArticleCrudController();
 						JOptionPane.showMessageDialog(null, "enregistré");
 						saveOk = addArt.addNewArticle(article, User.role);
+						
+						StockView skv;
+						try {
+							skv = new StockView();
+							HomeView.desk.add(skv);
+							skv.show();
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						} catch (PropertyVetoException e1) {
+							e1.printStackTrace();
+						}
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}

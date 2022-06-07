@@ -30,7 +30,9 @@ public class ContactCrudController {
 		try {
 			accessDataBase = DataConnection.openConnection();
 
-			String requestAdd = "INSERT INTO `contact` (cont_name, cont_f_name,cont_phone,cont_cell, cont_mail, cont_position, cont_comment) VALUES(?,?,?,?,?,?,?)";
+			//String requestAdd = "INSERT INTO `contact` (cont_name, cont_f_name,cont_phone,cont_cell, cont_mail, cont_position, cont_comment) VALUES(?,?,?,?,?,?,?)";
+			String requestAdd = "INSERT INTO `contact` (`cont_name`, `cont_f_name`,`cont_phone`,`cont_cell`, `cont_mail`, `cont_position`, `cont_comment`, `cont_user_id`) VALUES(?,?,?,?,?,?,?,?)";
+			
 			query = accessDataBase.prepareStatement(requestAdd, Statement.RETURN_GENERATED_KEYS);
 			query.setString(1, contact.getContName());
 			query.setString(2, contact.getContFName());
@@ -39,9 +41,11 @@ public class ContactCrudController {
 			query.setString(5, contact.getContMail());
 			query.setString(6, contact.getContPosition());
 			query.setString(7, contact.getContComment());
+			query.setInt(8, contact.getUserContId());
 			System.out.println(query);
 
 			query.execute();
+			System.out.println("CONTACT   : " +query);
 
 			rs = query.getGeneratedKeys();
 			if (rs.next()) {

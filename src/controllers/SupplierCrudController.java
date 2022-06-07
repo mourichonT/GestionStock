@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import models.Supplier;
+import models.User;
 import services.DataConnection;
 
 public class SupplierCrudController {
@@ -24,23 +25,27 @@ public class SupplierCrudController {
 
 	static boolean executeOk = false;
 
-	public boolean addNewSupplier(Supplier supplier, String role) throws SQLException {
+	public boolean addNewSupplier(Supplier supplier ,String role, int lastId) throws SQLException {
 
-		if (role == "admin") {
+		if (role.equals("admin")) {
 
 			try {
 				accessDataBase = DataConnection.openConnection();
-				String requestAdd = "INSERT INTO `supplier` (sup_address, sup_name, sup_phone, sup_cont_id) VALUES(?,?,?,?)";
+				String requestAdd = "INSERT INTO `supplier` (`sup_address`, `sup_name`, `sup_phone`, `sup_cont_id`, `sup_id_user`) VALUES(?,?,?,(SELECT `cont_id` FROM contact WHERE contact.cont_id = ?),?)";
 				query = accessDataBase.prepareStatement(requestAdd);
 				query.setString(1, supplier.getSupplierAddress());
 				query.setString(2, supplier.getSupplierName());
 				query.setString(3, supplier.getSupplierPhone());
-				query.setInt(4, supplier.getContactId());
+				query.setInt(4,  lastId);
+				query.setInt(5, User.userId);
 
+				System.out.println("SUPPLIER   : " +query);
+				
 				executeOk = query.execute();
 
 			} catch (SQLException ex) {
 				Logger.getLogger(DataConnection.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+				System.out.println(ex.getMessage());
 			}
 
 		} else {
@@ -127,7 +132,7 @@ public class SupplierCrudController {
 	}
 
 	public void deleteSup(String id, String role) {
-		if (role == "admin") {
+		if (role.equals("admin")) {
 			try {
 				accessDataBase = DataConnection.openConnection();
 				String requestDelete = "DELETE FROM `supplier` WHERE `sup_id` = ?";

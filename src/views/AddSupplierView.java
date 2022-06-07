@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -20,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.NumberFormatter;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -32,6 +34,7 @@ import models.Supplier;
 import models.User;
 
 import javax.swing.JSeparator;
+import javax.swing.JFormattedTextField;
 
 public class AddSupplierView extends JFrame {
 
@@ -45,6 +48,8 @@ public class AddSupplierView extends JFrame {
 	private String selectedItem;
 	private String[] listData = null;
 	private SupplierCrudController supplierCrudController = new SupplierCrudController();
+	private NumberFormat format = NumberFormat.getInstance();
+	private NumberFormatter formatter = new NumberFormatter(format);
 
 	public String[] getListData() {
 		return listData;
@@ -58,7 +63,7 @@ public class AddSupplierView extends JFrame {
 	static ResultSet rs = null;
 	static PreparedStatement queryAdd = null;
 	private JTextField textAddress;
-	private JTextField txtPhone;
+	private JFormattedTextField txtPhone;
 	private JTextField txtFName;
 	private JTextField txtPosition;
 	private JTextField txtPhoneCont;
@@ -75,6 +80,13 @@ public class AddSupplierView extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
+		
+		//formatter.setValueClass(Integer.class);
+		formatter.setMinimum(-1);
+		formatter.setMaximum(Integer.MAX_VALUE);
+		formatter.setAllowsInvalid(false);
+		formatter.setCommitsOnValidEdit(true);
 
 		JPanel panel = new JPanel();
 		panel.setBounds(5, 5, 426, 41);
@@ -138,24 +150,23 @@ public class AddSupplierView extends JFrame {
 				String name = txtName.getText();
 				String type = txtNameCont.getText();
 
-				int contactId = 0;
 				String contComment = "commentaire test";
-
+				int userContId = User.userId;
 				boolean saveOk = false;
 
 				SupplierCrudController addSup = new SupplierCrudController();
 				ContactCrudController addContact = new ContactCrudController();
 				try {
-					Contact contact = new Contact(0, txtNameCont.getText(), txtFName.getText(), txtPhoneCont.getText(),
-							txtCell.getText(), txtMail.getText(), txtPosition.getText(), contComment);
-					contactId = addContact.addNewContact(contact);
-					Supplier supplier = new Supplier(0, textAddress.getText(), txtName.getText(), txtPhone.getText(),
-							contactId);
+					Contact contact = new Contact(txtNameCont.getText(), txtFName.getText(), txtPhoneCont.getText(),
+							txtCell.getText(), txtMail.getText(), txtPosition.getText(), contComment, userContId);
 
-					JOptionPane.showMessageDialog(null, "enregistré");
-					saveOk = addSup.addNewSupplier(supplier, User.role);
+					int lastContactId = addContact.addNewContact(contact);
+					Supplier supplier = new Supplier(textAddress.getText(), txtName.getText(), txtPhone.getText());
 
-					contentPane.removeAll();
+					JOptionPane.showConfirmDialog(null, "enregistré");
+
+					saveOk = addSup.addNewSupplier(supplier, User.role, lastContactId);
+
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
@@ -175,7 +186,10 @@ public class AddSupplierView extends JFrame {
 		textAddress.setBounds(142, 191, 284, 19);
 		contentPane.add(textAddress);
 
-		txtPhone = new JTextField();
+		
+		
+		
+		txtPhone = new JFormattedTextField(formatter);
 		txtPhone.setColumns(10);
 		txtPhone.setBounds(142, 229, 284, 19);
 		contentPane.add(txtPhone);
@@ -251,6 +265,10 @@ public class AddSupplierView extends JFrame {
 		txtMail.setColumns(10);
 		txtMail.setBounds(142, 537, 284, 19);
 		contentPane.add(txtMail);
+
+		JFormattedTextField formattedTextField = new JFormattedTextField();
+		formattedTextField.setBounds(339, 598, 92, 19);
+		contentPane.add(formattedTextField);
 
 	}
 }
