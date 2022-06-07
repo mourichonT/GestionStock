@@ -55,7 +55,6 @@ import javax.swing.border.MatteBorder;
 
 public class ManagementConsoleViews extends JInternalFrame {
 	private ArrayList<User> users = null;
-	private ArrayList<User> Rolelist = null;
 	private ArrayList<RoleUser> RolelistView = null;
 	private int index = 0;
 	private int idSelected = 0;
@@ -64,8 +63,6 @@ public class ManagementConsoleViews extends JInternalFrame {
 	private Object[] roleListSelected = null;
 	private TableModel tabModel;
 	private String selectedItemRole;
-	private boolean flagShowPwd = false;
-	private boolean flagSelected = false;
 	private UserCrudController changedUser = new UserCrudController();
 	private SecurityController sc = new SecurityController();
 	boolean flag = false;
@@ -159,6 +156,8 @@ public class ManagementConsoleViews extends JInternalFrame {
 		panelUser.add(labelCellCont);
 
 		final JTextPane textPaneLogin = new JTextPane();
+		textPaneLogin.setEditable(false);
+		textPaneLogin.setEnabled(false);
 		textPaneLogin.setForeground(Color.BLACK);
 		textPaneLogin.setBackground(Color.WHITE);
 		textPaneLogin.setBounds(145, 65, 178, 19);
@@ -216,10 +215,6 @@ public class ManagementConsoleViews extends JInternalFrame {
 		Image image = imageIconShow.getImage();
 		Image resizedImg = image.getScaledInstance(20, 10, java.awt.Image.SCALE_SMOOTH);
 
-		ImageIcon imageIconHide = new ImageIcon(ManagementConsoleViews.class.getResource("/icons/hidepwd.png"));
-		Image imagehide = imageIconHide.getImage();
-		Image resizedImgHide = imagehide.getScaledInstance(20, 10, java.awt.Image.SCALE_SMOOTH);
-
 		final JToggleButton tbtnpwd1 = new JToggleButton();
 		tbtnpwd1.setSize(new Dimension(20, 10));
 		tbtnpwd1.setSelectedIcon(new ImageIcon(ManagementConsoleViews.class.getResource("/icons/hidepwd.png")));
@@ -256,7 +251,6 @@ public class ManagementConsoleViews extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				flagSelected = true;
 				index = model.getSelectedRow();
 				tabModel = model.getModel();
 				String userLogin = tabModel.getValueAt(index, 1).toString();
@@ -315,12 +309,6 @@ public class ManagementConsoleViews extends JInternalFrame {
 					System.out.println("Prénom n'a pas était saisie");
 				} else if (changedName.isEmpty()) {
 					System.out.println("Nom n'a pas était saisie");
-					/*
-					 * } else if (changedPwd.isEmpty()) {
-					 * System.out.println("Le mot de passe est vide "); } else if
-					 * (!changedPwd.equals(changedPwdConf)) {
-					 * System.out.println("Les mots de passes ne sont pas identique ");
-					 */
 				} else {
 
 					String newPassWordString = sc.doHashing(pw1);
@@ -360,6 +348,8 @@ public class ManagementConsoleViews extends JInternalFrame {
 
 					User userSelected = new User(idSelected, newPassWordString);
 					changedUser.changedPassWord(userSelected);
+					pw1.setText(null);
+					pw2.setText(null);
 				}
 			}
 		});
@@ -367,7 +357,7 @@ public class ManagementConsoleViews extends JInternalFrame {
 		btnChangerMotDe.setForeground(Color.WHITE);
 		btnChangerMotDe.setBorderPainted(false);
 		btnChangerMotDe.setBackground(new Color(0, 102, 0));
-		btnChangerMotDe.setBounds(535, 132, 139, 21);
+		btnChangerMotDe.setBounds(535, 132, 181, 21);
 		panelUser.add(btnChangerMotDe);
 
 		JButton btnAdd = new JButton("Ajouter");
@@ -397,7 +387,11 @@ public class ManagementConsoleViews extends JInternalFrame {
 								"êtes-vous sur de vouloir supprimer cet utilisateur", TITLE_PROPERTY,
 								JOptionPane.YES_NO_OPTION);
 						if (reply == JOptionPane.YES_OPTION) {
-							removeUser.deleteUser(idSelected, User.role);
+							
+							int useridSelected = (Integer)data[index][0];
+							
+							System.out.println(useridSelected);
+							removeUser.deleteUser(useridSelected, User.role);
 							ManagementConsoleViews mgv;
 							try {
 								mgv = new ManagementConsoleViews();

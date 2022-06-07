@@ -109,7 +109,7 @@ public class UserCrudController {
 			String requestUpDate = "UPDATE users SET `user_name`= ?, `user_f_name`= ?, `user_role_id`=(SELECT `role_id` FROM role WHERE `role_user` = ?) WHERE `user_id`=?";
 			CallableStatement statement = (CallableStatement) accessDataBase.prepareCall(requestUpDate);
 
-			statement.setString(1, user.getUserName());
+			statement.setString(1, user.getUserName().toUpperCase());
 			statement.setString(2, user.getUserFName());
 			statement.setString(3, user.getUserRole());
 			statement.setInt(4, user.getIdUser());
@@ -154,7 +154,7 @@ public class UserCrudController {
 				query = accessDataBase.prepareStatement(requestAdd);
 
 				query.setString(1, user.getLogin());
-				query.setString(2, user.getUserName());
+				query.setString(2, user.getUserName().toUpperCase());
 				query.setString(3, user.getUserFName());
 				query.setString(4, user.getPassword());
 				query.setString(5, user.getUserRole());

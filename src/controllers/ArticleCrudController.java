@@ -30,7 +30,7 @@ public class ArticleCrudController {
 			try {
 				accessDataBase = DataConnection.openConnection();
 
-				String requestAdd = "INSERT INTO `article` (name, spec_art, supplier, creation_date, price_art, quantity_art, type_art_id, art_prov_id ) VALUES(?,?,?,?,?,?,?,?)";
+				String requestAdd = "INSERT INTO `article` (name, spec_art, supplier, creation_date, price_art, quantity_art, type_art_id, art_prov_id,art_user_id ) VALUES(?,?,?,?,?,?,?,?,?)";
 				query = accessDataBase.prepareStatement(requestAdd);
 				query.setString(1, article.getName());
 				query.setString(2, article.getSpectArt());
@@ -40,8 +40,11 @@ public class ArticleCrudController {
 				query.setInt(6, article.getQuantityArt());
 				query.setInt(7, article.getTypeId());
 				query.setInt(8, article.getFournisseurID());
+				query.setInt(9, User.userId);
 
 				executeOk = query.execute();
+				
+				System.out.println(requestAdd);
 			} catch (SQLException ex) {
 				System.out.println(ex.getMessage());
 			}

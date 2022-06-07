@@ -80,7 +80,7 @@ public class AddArticleView extends JFrame {
 		lblName.setBounds(25, 85, 97, 28);
 		contentPane.add(lblName);
 
-		JLabel lblSpec = new JLabel("Nom :");
+		JLabel lblSpec = new JLabel("Specificit\u00E9s");
 		lblSpec.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblSpec.setBounds(25, 115, 97, 28);
 		contentPane.add(lblSpec);
@@ -209,25 +209,10 @@ public class AddArticleView extends JFrame {
 
 				boolean saveOk = false;
 
-				if (date == null) {
-					JOptionPane.showMessageDialog(null, "la date n'est pas définis");
-					System.out.println("la date n'est pas définis");
-
-				} else if (list.getSelectedItem() == null) {
-					System.out.println("le fournisseur article n'est pas définis");
-					JOptionPane.showMessageDialog(null, "le fournisseur article n'est pas définis");
-
-				} else if (name == null) {
-					System.out.println(" le nom n'est pas définis");
-					JOptionPane.showMessageDialog(null, "le nom n'est pas définis");
-
-				} else {
-
 					try {
 						ArticleCrudController addArt = new ArticleCrudController();
 						JOptionPane.showMessageDialog(null, "enregistré");
 						saveOk = addArt.addNewArticle(article, User.role);
-						
 						StockView skv;
 						try {
 							skv = new StockView();
@@ -247,7 +232,6 @@ public class AddArticleView extends JFrame {
 					}
 
 				}
-			}
 		});
 		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnNewButton.setBounds(167, 341, 85, 21);

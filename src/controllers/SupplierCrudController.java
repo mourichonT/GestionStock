@@ -131,13 +131,14 @@ public class SupplierCrudController {
 		return result;
 	}
 
-	public void deleteSup(String id, String role) {
+	public void deleteSup_cont(int id, int cont_idsup, String role) {
 		if (role.equals("admin")) {
 			try {
 				accessDataBase = DataConnection.openConnection();
-				String requestDelete = "DELETE FROM `supplier` WHERE `sup_id` = ?";
+				String requestDelete = "CALL deleteSup_cont(?,?)";
 				query = accessDataBase.prepareStatement(requestDelete);
-				query.setString(1, id);
+				query.setInt(1, id);
+				query.setInt(2,cont_idsup);
 				System.out.println(query);
 				executeOk = query.execute();
 				System.out.println("deleted");

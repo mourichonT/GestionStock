@@ -25,6 +25,7 @@ import javax.swing.table.TableRowSorter;
 import controllers.ArticleCrudController;
 import controllers.ContactCrudController;
 import controllers.SupplierCrudController;
+import controllers.UserCrudController;
 import models.Article;
 import models.Contact;
 import models.Supplier;
@@ -62,7 +63,6 @@ public class SupplierView extends JInternalFrame {
 	boolean flagSupplier = false;
 	static boolean plClosing = false;
 	int index = 0;
-	private String selectedItem;
 	private ArrayList<Supplier> suppliers = null;
 	private ArrayList<Contact> contacts = null;
 	private static final long serialVersionUID = 1L;
@@ -255,12 +255,26 @@ public class SupplierView extends JInternalFrame {
 					if (flagSupplier) {
 						SupplierCrudController deleteSupplier = new SupplierCrudController();
 						int reply = JOptionPane.showConfirmDialog(null,
-								"Attention, supprimer un fournisseur entrainerai une perte des liaisons avec les articles associés, êtes-vous sur de vouloir supprimer celui-ci",
+								"Attention, supprimer un fournisseur entrainerai une perte des contacts associés, êtes-vous sur de vouloir supprimer celui-ci",
 								TITLE_PROPERTY, JOptionPane.YES_NO_OPTION);
 						if (reply == JOptionPane.YES_OPTION) {
 							System.out.println("deteled");
-							String id = dataSuppliers[index][0].toString();
-							deleteSupplier.deleteSup(id, User.role);
+							int id = (Integer) dataSuppliers[index][0];
+							int contId = (Integer)dataSuppliers[index][4];
+							deleteSupplier.deleteSup_cont(id, contId, User.role);
+							System.out.println(" CONTACT ID :" + contId);
+							try {
+								SupplierView.pl = new SupplierView(null);
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (PropertyVetoException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							HomeView.desk.add(pl);
+							textAreaCommentCont.setText(" ");
+							pl.show();
 						} else {
 							JOptionPane.showMessageDialog(null, "ok");
 							System.exit(0);
@@ -291,17 +305,14 @@ public class SupplierView extends JInternalFrame {
 		JButton btnModifier = new JButton("Effacer la recherche");
 		btnModifier.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
 				try {
 					SupplierView.pl = new SupplierView(null);
 					HomeView.desk.add(pl);
 					textAreaCommentCont.setText(" ");
 					pl.show();
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (PropertyVetoException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -394,11 +405,9 @@ public class SupplierView extends JInternalFrame {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-
 				}
 			});
 		}
-
 		removeTitleBar();
 	}
 

@@ -591,7 +591,6 @@ public class StockView extends JInternalFrame {
 
 						} else {
 							JOptionPane.showMessageDialog(null, "ok");
-							System.exit(0);
 						}
 
 					} catch (SQLException e1) {
@@ -599,6 +598,16 @@ public class StockView extends JInternalFrame {
 					}
 				} else {
 					JOptionPane.showMessageDialog(null, "veuillez selectionner un article supprimer");
+				}
+				StockView skv;
+				try {
+					skv = new StockView();
+					HomeView.desk.add(skv);
+					skv.show();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				} catch (PropertyVetoException e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
